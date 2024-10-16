@@ -1,0 +1,81 @@
+<launch>
+
+	
+	<!-- global localization node -->
+	<rosparam command="load" file="$(find lidar_localization)/config/general_config.yaml" ns="/lidar_global_localization" />
+  	<rosparam command="load" file="$(find lidar_localization)/config/bbs_config.yaml" ns="/lidar_global_localization" />
+	<node pkg="lidar_localization" type="lidar_global_localization_node" name="lidar_global_localization" output="screen" />
+
+	<!-- arguments -->
+	<arg name="nodelet_manager" default="lidar_nodelet_manager" />
+
+	<node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)"  args="manager" output="screen"/>
+
+	<!-- globalmap_server_nodelet -->
+	<node pkg="nodelet" type="nodelet" name="GlobalMap" args="load lidar_localization/GlobalMapNodelet $(arg nodelet_manager)">
+		<param name="globalmap_pcd" value="$(find lidar_localization)/data/map.pcd" />
+		<param name="downsample_resolution" value="0.4" />
+	</node>
+
+	<!-- preprocess_nodelet -->
+	<node pkg="nodelet" type="nodelet" name="Preprocess" args="load lidar_localization/PreprocessNodelet $(arg nodelet_manager)" output="screen">
+		<remap from="pandora/points"  to="pandora/points" />
+        <remap from="velodyne_points" to="velodyne_points" />
+		<!-- clock delay = (t.pandora - t.other_sensor) * 10^2 25199.840000-->
+		<param name="clock_delay" value="0" />
+		<!-- distance and height filter -->
+		<param name="use_distance_filter" value="true" />
+		<param name="distance_near_thresh" value="1.2" />
+		<param name="distance_far_thresh" value="40.0" />
+		<param name="height_max" value="20.0" />
+		<param name="height_min" value="-2.0" />
+		<!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
+		<param name="downsample_method" value="VOXELGRID" />
+		<param name="downsample_resolution" value="0.4" />
+		<!-- NONE, RADIUS, or STATISTICAL -->
+		<param name="outlier_removal_method" value="RADIUS" />
+		<param name="statistical_mean_k" value="30" />
+		<param name="statistical_stddev" value="1.2" />
+		<param name="radius_radius" value="0.5" />
+		<param name="radius_min_neighbors" value="3" />
+    </node>
+
+	<!-- lidar_localization_nodelet -->
+    <node pkg="nodelet" type="nodelet" name="lidar_localization_nodelet" args="load lidar_localization/LidarLocalizationNodelet $(arg nodelet_manager)">
+	  <param name="use_sim_time" value="false" />
+      <remap from="/velodyne_points" to="velodyne_points" />
+	  <remap from="/fusion_pose" to="span/enuposeCovs" />
+      <!-- ndt settings -->
+      <!-- available reg_methods: NDT_OMP -->
+      <param name="reg_method" value="NDT_OMP" />
+      <!-- if NDT is slow for your PC, try DIRECT1 serach method, which is a bit unstable but extremely fast -->
+      <param name="ndt_neighbor_search_method" value="DIRECT7" />
+      <param name="ndt_neighbor_search_radius" value="2.0" />
+      <param name="ndt_resolution" value="1.0" />
+      <param name="downsample_resolution" value="0.4" />
+	  <!-- initial pose in map  -->
+      <!-- if "specify_init_pose" is true, pose estimator will be initialized with the following params -->
+      <!-- otherwise, you need to input an initial pose with "2D Pose Estimate" on rviz" -->
+      <param name="specify_init_pose" value="true" />
+      <param name="init_pos_x" value="0.0" />
+      <param name="init_pos_y" value="0.0" />
+      <param name="init_pos_z" value="0.0" />
+      <param name="init_ori_w" value="1.0" />
+      <param name="init_ori_x" value="0.0" />
+      <param name="init_ori_y" value="0.0" />
+      <param name="init_ori_z" value="0.0" />
+	  <!-- initial pose in enu  -->
+	  <param name="init_enu_pos_x" value="-141.6273" />
+	  <param name="init_enu_pos_y" value="107.1457" />
+	  <param name="init_enu_pos_z" value="0.5035" />
+	  <param name="init_enu_ori_w" value="0.897777" />
+	  <param name="init_enu_ori_x" value="0.0118" />
+	  <param name="init_enu_ori_y" value="0.0076" />
+	  <param name="init_enu_ori_z" value="0.4402" />
+
+    </node>
+
+	<node pkg="rviz" type="rviz" name="lidar_localization_rviz" args="-d $(find lidar_localization)/rviz/lidar_localization.rviz" />
+
+
+</launch>

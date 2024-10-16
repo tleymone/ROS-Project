@@ -1,0 +1,12 @@
+<package>
+  <description brief="GNSS_PosCov">
+
+     GNSS_PosCov
+
+  </description>
+  <author>syj1754</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/GNSS_PosCov</url>
+
+</package>

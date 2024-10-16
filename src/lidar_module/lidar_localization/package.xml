@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>lidar_localization</name>
+  <version>1.0.0</version>
+  <description>The lidar_localization package, a service "relocalize" is available for initialization</description>
+
+  <maintainer email="ziang.zhou@etu.utc.fr">zhou.ziang</maintainer>
+  <license>TODO</license>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>pcl_ros</depend>
+  <depend>roslib</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf</depend>
+  <depend>pcl_conversions</depend>
+  <depend>ndt_omp</depend>
+  <depend>fast_gicp</depend>
+  <depend>hdl_graph_slam</depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <export>
+  	<nodelet plugin="${prefix}/nodelets.xml"/>
+  </export>
+  
+</package>

@@ -1,0 +1,31 @@
+<launch>
+
+	<!-- arguments -->
+	<arg name="nodelet_manager" default="lidar_nodelet_manager" />
+
+	<node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)"  args="manager" output="screen"/>
+
+	<!-- preprocess_nodelet -->
+	<node pkg="nodelet" type="nodelet" name="Preprocess" args="load lidar_localization/PreprocessNodelet $(arg nodelet_manager)" output="screen">
+		<remap from="pandora/points"  to="pandora/points" />
+        <remap from="velodyne_points" to="velodyne_points" />
+		<!-- clock delay = (t.pandora - t.other_sensor) * 10^2 -->
+		<param name="clock_delay" value="25199.840000" />
+		<!-- distance and height filter -->
+		<param name="use_distance_filter" value="true" />
+		<param name="distance_near_thresh" value="1.2" />
+		<param name="distance_far_thresh" value="50.0" />
+		<param name="height_max" value="30.0" />
+		<param name="height_min" value="-1.7" />
+		<!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
+		<param name="downsample_method" value="VOXELGRID" />
+		<param name="downsample_resolution" value="0.4" />
+		<!-- NONE, RADIUS, or STATISTICAL -->
+		<param name="outlier_removal_method" value="RADIUS" />
+		<param name="statistical_mean_k" value="30" />
+		<param name="statistical_stddev" value="1.2" />
+		<param name="radius_radius" value="0.5" />
+		<param name="radius_min_neighbors" value="3" />
+    </node>
+
+</launch>

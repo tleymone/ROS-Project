@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/lib/**",
+                "/opt/ros/**",
+                "/usr/include/pcl-1.10",
+                "/home/zhou/sy27_ws/devel/include",
+                "/home/zhou/sy27_ws/src/ndt_omp/include",
+                "/usr/include/eigen3",
+                "/opt/ros/noetic/include",
+                "${workspaceFolder}",
+                "${workspaceFolder}/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}

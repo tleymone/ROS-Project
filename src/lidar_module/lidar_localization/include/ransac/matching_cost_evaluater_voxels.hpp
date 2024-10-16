@@ -1,0 +1,43 @@
+#ifndef MATCHING_COST_EVALUATER_VOXELS_HPP
+#define MATCHING_COST_EVALUATER_VOXELS_HPP
+
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/search/kdtree.h>
+#include <pcl/common/transforms.h>
+
+#include "voxelset.hpp"
+#include "matching_cost_evaluater.hpp"
+
+namespace lidar_localization {
+
+class MatchingCostEvaluaterVoxels : public MatchingCostEvaluater {
+public:
+  MatchingCostEvaluaterVoxels() {}
+  virtual ~MatchingCostEvaluaterVoxels() override {}
+
+  virtual void set_target(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, double max_correspondence_distance) override {
+    max_correspondence_distance_sq = max_correspondence_distance * max_correspondence_distance;
+
+    voxels.reset(new VoxelSet(max_correspondence_distance));
+    voxels->set_cloud(cloud); //global map， 计算global map的voxels
+  }
+
+  virtual double calc_matching_error(const pcl::PointCloud<pcl::PointXYZ>& cloud, const Eigen::Matrix4f& transformation, double* inlier_fraction) override {
+    int num_inliers = 0;
+    double matching_error = 0.0;
+
+    pcl::PointCloud<pcl::PointXYZ> transformed;
+    pcl::transformPointCloud(cloud, transformed, transformation);
+
+    return voxels->matching_error(transformed, inlier_fraction); //对计算的transform进行评价，计算inliers比例
+  }
+
+private:
+  double max_correspondence_distance_sq;
+  std::unique_ptr<VoxelSet> voxels;
+};
+
+}
+
+#endif
